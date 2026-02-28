@@ -1,0 +1,46 @@
+{
+    "name": "MedDRA Hierarchy Provider",
+    "namespace": "AECRI\\MeddraHierarchyProvider",
+    "description": "Provides hierarchical MedDRA ontology autocomplete with cascading filtered search. Each level (SOC, HLGT, HLT, PT, LLT) filters based on the parent field selection. Load your MedDRA .asc files and get 5 clean autocomplete fields with true hierarchy filtering.",
+    "documentation": "README.md",
+    "authors": [
+        {
+            "name": "MedDRA REDCap Integration",
+            "email": "",
+            "institution": ""
+        }
+    ],
+    "framework-version": 12,
+    "permissions": [
+        "redcap_every_page_before_render",
+        "redcap_data_entry_form",
+        "redcap_survey_page"
+    ],
+    "no-auth-pages": [
+        "search_service"
+    ],
+    "system-settings": [
+        {
+            "key": "meddra-data-path",
+            "name": "MedDRA Data Directory Path<br><small>Absolute path to the folder containing MedDRA .asc files (soc.asc, hlgt.asc, hlt.asc, pt.asc, llt.asc, soc_hlgt.asc, hlgt_hlt.asc, hlt_pt.asc) on the REDCap server.<br>Example: <code>/var/meddra/MedAscii</code></small>",
+            "required": true,
+            "type": "text"
+        },
+        {
+            "key": "meddra-cache-file",
+            "name": "Cache File Path<br><small>Path where the module will write a JSON cache for fast lookups. The web server must have write permission.<br>Example: <code>/var/meddra/meddra_cache.json</code></small>",
+            "required": true,
+            "type": "text"
+        },
+        {
+            "key": "meddra-version-label",
+            "name": "MedDRA Version Label<br><small>e.g. '27.1' — shown in the Online Designer when selecting this ontology</small>",
+            "required": false,
+            "type": "text"
+        }
+    ],
+    "compatibility": {
+        "php-version-min": "7.4",
+        "redcap-version-min": "10.0.0"
+    }
+}

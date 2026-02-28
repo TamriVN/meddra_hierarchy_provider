@@ -1,0 +1,393 @@
+Variable / Field Name,Form Name,Section Header,Field Type,Field Label,"Choices, Calculations, OR Slider Labels",Field Note,Text Validation Type OR Show Slider Number,Text Validation Min,Text Validation Max,Identifier?,Branching Logic (Show field only if...),Required Field?,Custom Alignment,Question Number (surveys only),Matrix Group Name,Matrix Ranking?,Field Annotation
+record_id,meddra_term_registry,,text,Record ID,,,,,,,,,,,,,
+meddra_banner,meddra_term_registry,,descriptive,"<div style=""background:linear-gradient(135deg,#8b1a1a 0%,#a83232 100%);border-radius:6px;padding:18px 22px;font-family:sans-serif;color:white;"">
+<div style=""font-size:16px;font-weight:700;"">&#9877; MedDRA Term Registry</div>
+<div style=""font-size:12px;opacity:0.85;margin-top:4px;"">Hierarchical coding with cascading filtered autocomplete (MedDRA Hierarchy Provider Module)</div>
+<div style=""font-size:11px;opacity:0.7;margin-top:6px;"">&#128260; Repeating Instrument &mdash; One entry per adverse event term</div>
+</div>",,,,,,,,,,,,,
+ae_verbatim_term,meddra_term_registry,Adverse Event Term,text,Adverse Event Verbatim Term,,Enter AE term exactly as reported (free text),,,,,,y,,,,,
+ae_term_date,meddra_term_registry,,text,Date AE Term Reported,,,date_ymd,,,,,,,,,,
+meddra_legend,meddra_term_registry,MedDRA Coding,descriptive,"<div style=""background:#fff;border:1px solid #d4d0c8;border-radius:6px;padding:14px 18px;font-size:12px;color:#6b6b6b;font-family:sans-serif;"">
+<div style=""margin-bottom:8px;font-weight:600;color:#1a1a1a;"">MedDRA 5-Level Hierarchy (each level filters by parent selection):</div>
+<div style=""display:flex;align-items:center;gap:6px;flex-wrap:wrap;"">
+<span style=""display:inline-flex;align-items:center;gap:4px;""><span style=""width:12px;height:12px;background:#8b1a1a;border-radius:2px;display:inline-block;""></span> <b style=""color:#8b1a1a;"">SOC</b></span>
+<span style=""color:#d4d0c8;"">&rarr;</span>
+<span style=""display:inline-flex;align-items:center;gap:4px;""><span style=""width:12px;height:12px;background:#b45309;border-radius:2px;display:inline-block;""></span> <b style=""color:#b45309;"">HLGT</b></span>
+<span style=""color:#d4d0c8;"">&rarr;</span>
+<span style=""display:inline-flex;align-items:center;gap:4px;""><span style=""width:12px;height:12px;background:#2d6a4f;border-radius:2px;display:inline-block;""></span> <b style=""color:#2d6a4f;"">HLT</b></span>
+<span style=""color:#d4d0c8;"">&rarr;</span>
+<span style=""display:inline-flex;align-items:center;gap:4px;""><span style=""width:12px;height:12px;background:#1e40af;border-radius:2px;display:inline-block;""></span> <b style=""color:#1e40af;"">PT</b></span>
+<span style=""color:#d4d0c8;"">&rarr;</span>
+<span style=""display:inline-flex;align-items:center;gap:4px;""><span style=""width:12px;height:12px;background:#7c3aed;border-radius:2px;display:inline-block;""></span> <b style=""color:#7c3aed;"">LLT</b></span>
+</div>
+<div style=""margin-top:8px;font-size:11px;color:#999;"">Type to search &mdash; results are filtered by the selection above. MedDRA code stored as raw value.</div>
+</div>",,,,,,,,,,,,,
+meddra_soc,meddra_term_registry,,text,"<b style=""color:#8b1a1a;"">SOC</b> - System Organ Class",MEDDRA_HIER:MEDDRA_SOC,Type to search MedDRA System Organ Class. Filtered by parent selection. Code stored as raw value.,,,,,,y,,,,,
+meddra_hlgt,meddra_term_registry,,text,"<b style=""color:#b45309;"">HLGT</b> - High Level Group Term",MEDDRA_HIER:MEDDRA_HLGT,Type to search MedDRA High Level Group Term. Filtered by parent selection. Code stored as raw value.,,,,,,,,,,,@MEDDRA_PARENT=meddra_soc
+meddra_hlt,meddra_term_registry,,text,"<b style=""color:#2d6a4f;"">HLT</b> - High Level Term",MEDDRA_HIER:MEDDRA_HLT,Type to search MedDRA High Level Term. Filtered by parent selection. Code stored as raw value.,,,,,,,,,,,@MEDDRA_PARENT=meddra_hlgt
+meddra_pt,meddra_term_registry,,text,"<b style=""color:#1e40af;"">PT</b> - Preferred Term",MEDDRA_HIER:MEDDRA_PT,Type to search MedDRA Preferred Term. Filtered by parent selection. Code stored as raw value.,,,,,,y,,,,,@MEDDRA_PARENT=meddra_hlt
+meddra_llt,meddra_term_registry,,text,"<b style=""color:#7c3aed;"">LLT</b> - Lowest Level Term",MEDDRA_HIER:MEDDRA_LLT,Type to search MedDRA Lowest Level Term. Filtered by parent selection. Code stored as raw value.,,,,,,,,,,,@MEDDRA_PARENT=meddra_pt
+meddra_coding_path,meddra_term_registry,,descriptive,"<div style=""background:#f8f7f4;border:1px solid #d4d0c8;border-radius:6px;padding:16px 20px;font-family:sans-serif;"">
+<div style=""font-size:13px;font-weight:600;color:#8b1a1a;margin-bottom:10px;"">&#128203; Current MedDRA Coding Path</div>
+<table style=""width:100%;border-collapse:collapse;font-size:13px;"">
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:8px 12px;font-weight:600;color:#8b1a1a;width:60px;""><span style=""background:#fdf2f2;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;"">SOC</span></td>
+<td style=""padding:8px 12px;"">[meddra_soc]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:8px 12px;font-weight:600;color:#b45309;width:60px;""><span style=""background:#fef3c7;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;"">HLGT</span></td>
+<td style=""padding:8px 12px;"">[meddra_hlgt]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:8px 12px;font-weight:600;color:#2d6a4f;width:60px;""><span style=""background:#d8f3dc;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;"">HLT</span></td>
+<td style=""padding:8px 12px;"">[meddra_hlt]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:8px 12px;font-weight:600;color:#1e40af;width:60px;""><span style=""background:#dbeafe;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;"">PT</span></td>
+<td style=""padding:8px 12px;"">[meddra_pt]</td></tr>
+<tr>
+<td style=""padding:8px 12px;font-weight:600;color:#7c3aed;width:60px;""><span style=""background:#ede9fe;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;"">LLT</span></td>
+<td style=""padding:8px 12px;"">[meddra_llt]</td></tr>
+</table></div>",,,,,,,,,,,,,
+coded_by,meddra_term_registry,Coding Metadata,text,Coded By,,Name or ID of coder,,,,,,,,,,,
+coding_date,meddra_term_registry,,text,Date Coded,,,date_ymd,,,,,,,,,,
+coding_notes,meddra_term_registry,,notes,Coding Notes,,,,,,,,,,,,,
+ae_assess_banner,ae_sae_assessment,,descriptive,"<div style=""background:linear-gradient(135deg,#1e40af 0%,#3b82f6 100%);border-radius:6px;padding:18px 22px;font-family:sans-serif;color:white;"">
+<div style=""font-size:16px;font-weight:700;"">&#128202; Adverse Event / SAE Assessment</div>
+<div style=""font-size:12px;opacity:0.85;margin-top:4px;"">Clinical assessment for adverse event terms from the MedDRA Term Registry</div>
+</div>",,,,,,,,,,,,,
+ae_term_card_1,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #1</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][1]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][1]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][1]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][1]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][1] <> '',,,,,,
+ae_term_card_2,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #2</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][2]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][2]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][2]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][2]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][2] <> '',,,,,,
+ae_term_card_3,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #3</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][3]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][3]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][3]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][3]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][3] <> '',,,,,,
+ae_term_card_4,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #4</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][4]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][4]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][4]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][4]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][4] <> '',,,,,,
+ae_term_card_5,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #5</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][5]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][5]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][5]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][5]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][5] <> '',,,,,,
+ae_term_card_6,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #6</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][6]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][6]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][6]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][6]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][6] <> '',,,,,,
+ae_term_card_7,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #7</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][7]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][7]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][7]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][7]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][7] <> '',,,,,,
+ae_term_card_8,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #8</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][8]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][8]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][8]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][8]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][8] <> '',,,,,,
+ae_term_card_9,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #9</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][9]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][9]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][9]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][9]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][9] <> '',,,,,,
+ae_term_card_10,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #10</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][10]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][10]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][10]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][10]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][10] <> '',,,,,,
+ae_term_card_11,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #11</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][11]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][11]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][11]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][11]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][11] <> '',,,,,,
+ae_term_card_12,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #12</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][12]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][12]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][12]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][12]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][12] <> '',,,,,,
+ae_term_card_13,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #13</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][13]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][13]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][13]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][13]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][13] <> '',,,,,,
+ae_term_card_14,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #14</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][14]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][14]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][14]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][14]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][14] <> '',,,,,,
+ae_term_card_15,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #15</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][15]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][15]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][15]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][15]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][15] <> '',,,,,,
+ae_term_card_16,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #16</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][16]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][16]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][16]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][16]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][16] <> '',,,,,,
+ae_term_card_17,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #17</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][17]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][17]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][17]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][17]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][17] <> '',,,,,,
+ae_term_card_18,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #18</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][18]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][18]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][18]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][18]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][18] <> '',,,,,,
+ae_term_card_19,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #19</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][19]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][19]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][19]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][19]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][19] <> '',,,,,,
+ae_term_card_20,ae_sae_assessment,,descriptive,"<div style=""background:#f0f7ff;border:1px solid #bfdbfe;border-radius:6px;overflow:hidden;font-family:sans-serif;margin-bottom:4px;"">
+<div style=""background:#dbeafe;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;"">
+<div><span style=""font-size:14px;font-weight:700;color:#1e40af;"">Term #20</span>
+<span style=""font-size:13px;color:#1e40af;margin-left:12px;"">[ae_verbatim_term][20]</span></div>
+<span style=""font-size:11px;color:#6b7280;"">Date: [ae_term_date][20]</span></div>
+<table style=""width:100%;border-collapse:collapse;"">
+<tr style=""border-bottom:2px solid #bfdbfe;"">
+<th style=""padding:6px 12px;text-align:center;font-size:11px;color:#6b7280;font-weight:600;width:60px;"">Level</th>
+<th style=""padding:6px 12px;text-align:left;font-size:11px;color:#6b7280;font-weight:600;"">Term</th></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#fdf2f2;color:#8b1a1a;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">SOC</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_soc][20]</td></tr>
+<tr style=""border-bottom:1px solid #e8e4dc;"">
+<td style=""padding:6px 12px;text-align:center;""><span style=""background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:11px;font-weight:600;"">PT</span></td>
+<td style=""padding:6px 12px;font-size:12px;"">[meddra_pt][20]</td></tr>
+</table></div>",,,,,,,[ae_verbatim_term][20] <> '',,,,,,
+ae_term_assessed,ae_sae_assessment,Assessment,text,AE Term # being assessed,,Enter the term number from the cards above,integer,,,,,y,,,,,
+ae_onset_date,ae_sae_assessment,Event Details,text,AE Onset Date,,,date_ymd,,,,,y,,,,,
+ae_end_date,ae_sae_assessment,,text,AE Resolution Date,,,date_ymd,,,,,,,,,,
+ae_ongoing,ae_sae_assessment,,yesno,Is the AE ongoing?,,,,,,,,,,,,,
+ae_severity,ae_sae_assessment,Severity & Seriousness,radio,Severity,"1, Mild | 2, Moderate | 3, Severe | 4, Life-threatening | 5, Death",,,,,,,y,,,,,
+ae_serious,ae_sae_assessment,,yesno,Is this a Serious Adverse Event (SAE)?,,,,,,,,y,,,,,
+ae_sae_criteria,ae_sae_assessment,,checkbox,SAE Criteria (select all that apply),"1, Results in death | 2, Life-threatening | 3, Requires inpatient hospitalization or prolongation of existing hospitalization | 4, Results in persistent or significant disability/incapacity | 5, Congenital anomaly/birth defect | 6, Other medically important event",,,,,,[ae_serious] = '1',y,,,,,
+ae_sae_criteria_other,ae_sae_assessment,,text,"If other, specify",,,,,,,[ae_serious] = '1' and [ae_sae_criteria(6)] = '1',,,,,,
+ae_outcome,ae_sae_assessment,Outcome & Causality,radio,Outcome,"1, Recovered/Resolved | 2, Recovering/Resolving | 3, Not recovered/Not resolved | 4, Recovered with sequelae | 5, Fatal | 6, Unknown",,,,,,,y,,,,,
+ae_relationship,ae_sae_assessment,,radio,Relationship to Study Drug,"1, Not related | 2, Unlikely | 3, Possible | 4, Probable | 5, Definite",,,,,,,y,,,,,
+ae_action_taken,ae_sae_assessment,,radio,Action Taken with Study Drug,"1, None | 2, Dose reduced | 3, Drug interrupted | 4, Drug withdrawn | 5, Not applicable",,,,,,,,,,,,
+ae_treatment_given,ae_sae_assessment,Treatment,yesno,Was treatment given for the AE?,,,,,,,,,,,,,
+ae_treatment_desc,ae_sae_assessment,,textarea,Describe treatment given,,,,,,,[ae_treatment_given] = '1',,,,,,
+ae_reporter,ae_sae_assessment,Reporting,text,Reported By,,Name of reporter,,,,,,,,,,,
+ae_report_date,ae_sae_assessment,,text,Date Reported,,,date_ymd,,,,,,,,,,
+ae_assessor,ae_sae_assessment,,text,Assessed By,,Name of physician/investigator,,,,,,,,,,,
+ae_assess_date,ae_sae_assessment,,text,Date Assessed,,,date_ymd,,,,,,,,,,
+ae_comments,ae_sae_assessment,,notes,Additional Comments,,,,,,,,,,,,,
