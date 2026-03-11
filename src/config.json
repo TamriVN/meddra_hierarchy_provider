@@ -6,15 +6,9 @@
     "authors": [
         {
             "name": "MedDRA REDCap Integration",
-            "email": "",
-            "institution": ""
+            "email": "contact@aecri.org",
+            "institution": "AECRI"
         }
-    ],
-    "framework-version": 12,
-    "permissions": [
-        "redcap_every_page_before_render",
-        "redcap_data_entry_form",
-        "redcap_survey_page"
     ],
     "no-auth-pages": [
         "search_service"
@@ -39,6 +33,15 @@
             "type": "text"
         }
     ],
+    "action-tags": [
+        {
+            "tag": "@MEDDRA_PARENT",
+            "description": "Liên kết trường con MedDRA với trường cha. Dùng cú pháp: @MEDDRA_PARENT=tên_trường_cha<br>Ví dụ: Trường HLGT thêm <code>@MEDDRA_PARENT=meddra_soc</code> để lọc theo SOC đã chọn."
+        }
+    ],
+    "hooks": {
+        "redcap_every_page_before_render": "redcap_every_page_before_render"
+    },
     "compatibility": {
         "php-version-min": "7.4",
         "redcap-version-min": "10.0.0"

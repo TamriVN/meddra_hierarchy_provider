@@ -5,6 +5,9 @@ meddra/
 dist/*
 !dist/*.zip
 
+# Hotfix
+hotfix/
+
 # ── Cache files ──────────────────────────────────────────────────────────────
 meddra_cache.json
 *.cache.json

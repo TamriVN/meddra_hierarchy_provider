@@ -134,29 +134,40 @@ class MeddraHierarchyProviderModule extends AbstractExternalModule implements \O
     public function __construct()
     {
         parent::__construct();
-
-        // OntologyManager is only available in REDCap ≥ 8.8.1.
-        // The class_exists guard prevents fatal errors on older installations.
-        if (class_exists('\OntologyManager')) {
-            $manager = \OntologyManager::getOntologyManager();
-            $manager->addProvider($this);
-        }
+        // OntologyProvider registration is in redcap_every_page_before_render()
+        // because OntologyManager.php is not yet loaded during EM bootstrap.
     }
 
     /**
      * Hook: fires on every REDCap page before rendering.
      *
-     * The actual OntologyProvider registration is handled in the constructor
-     * so this method body is empty. Declaring the hook in config.json and
-     * having an empty method here ensures the module is instantiated (and
-     * thus registered) on every page — including the Online Designer — not
-     * only on data-entry pages.
+     * IMPORTANT: This hook fires during init_functions.php bootstrap, which is
+     * BEFORE OntologyManager.php is included by the calling page. We therefore
+     * load OntologyManager.php explicitly using APP_PATH_DOCROOT so we can
+     * call addProvider() regardless of include order.
      *
      * @param int|null $project_id Current project ID (null on system pages)
      */
     public function redcap_every_page_before_render($project_id)
     {
-        // Registration happens in __construct(); nothing else needed here.
+        // Explicitly load OntologyManager if not already included.
+        // The hook fires before the page has had a chance to include it.
+        if (!class_exists('OntologyManager') && defined('APP_PATH_DOCROOT')) {
+            $om = APP_PATH_DOCROOT . 'Classes/OntologyManager.php';
+            if (file_exists($om)) {
+                require_once $om;
+                error_log('[MedDRA-DEBUG] Manually loaded OntologyManager.php. PAGE=' . ($_SERVER['REQUEST_URI'] ?? '?'));
+            } else {
+                error_log('[MedDRA-DEBUG] OntologyManager.php NOT FOUND at: ' . $om);
+            }
+        }
+
+        if (class_exists('OntologyManager')) {
+            \OntologyManager::getOntologyManager()->addProvider($this);
+            error_log('[MedDRA-DEBUG] addProvider() OK. PAGE=' . ($_SERVER['REQUEST_URI'] ?? '?'));
+        } else {
+            error_log('[MedDRA-DEBUG] OntologyManager still not available.');
+        }
     }
 
     /**
@@ -555,15 +566,110 @@ class MeddraHierarchyProviderModule extends AbstractExternalModule implements \O
         $handle = fopen($filepath, 'r');
         if (!$handle) return $rows;
 
+        // Auto-detect delimiter: read first non-empty line to check for '|' vs '$'
+        $delim = '$';
+        $peek  = '';
+        while (($peek = fgets($handle)) !== false) {
+            $peek = trim($peek);
+            if ($peek !== '') break;
+        }
+        if ($peek !== '' && strpos($peek, '|') !== false && strpos($peek, '$') === false) {
+            $delim = '|';
+        }
+        rewind($handle);
+
         while (($line = fgets($handle)) !== false) {
-            $line = trim($line);            // removes \r, \n, and leading spaces
-            $line = rtrim($line, '$');      // removes trailing '$' delimiters
+            $line = trim($line);
+            if ($delim === '$') {
+                $line = rtrim($line, '$'); // remove trailing '$' sentinels in real MedDRA files
+            }
             if (empty($line)) continue;
-            $parts = array_map('trim', explode('$', $line));
+            $parts = array_map('trim', explode($delim, $line));
             $rows[] = $parts;
         }
         fclose($handle);
         return $rows;
+    }
+
+    /**
+     * Parses the combined MedDRA hierarchy file (mdhier.asc).
+     *
+     * mdhier.asc contains one row per PT-SOC pair with columns:
+     *   [0] pt_code   [1] hlt_code  [2] hlgt_code  [3] soc_code_primary
+     *   [4] soc_code  [5] soc_name  [6] null        [7] pt_soc_flag
+     *
+     * Returns an array with keys:
+     *   'soc'      => [soc_code => soc_name]
+     *   'soc_hlgt' => [soc_code => [hlgt_code, ...]]
+     *   'hlgt_hlt' => [hlgt_code => [hlt_code, ...]]
+     *   'hlt_pt'   => [hlt_code  => [pt_code, ...]]
+     *
+     * @param string $folder  Absolute path to the MedDRA data directory
+     * @return array
+     */
+    private function parseMdhier($folder)
+    {
+        $out = [
+            'soc'      => [],
+            'soc_hlgt' => [],
+            'hlgt_hlt' => [],
+            'hlt_pt'   => [],
+        ];
+
+        $file = $folder . '/mdhier.asc';
+        if (!file_exists($file)) return $out;
+
+        foreach ($this->parseAsc($file) as $row) {
+            // Need at least pt, hlt, hlgt, soc_code, soc_name
+            if (count($row) < 5) continue;
+
+            $pt_code   = $row[0];
+            $hlt_code  = $row[1];
+            $hlgt_code = $row[2];
+
+            // Column [4] is soc_code, [5] is soc_name when 8-col format
+            // Column [3] is soc_code, [4] is soc_name when 7-col format
+            if (count($row) >= 6 && is_numeric($row[4])) {
+                // 8-column format: [3]=soc_primary [4]=soc_code [5]=soc_name
+                $soc_code = $row[4];
+                $soc_name = $row[5] ?? '';
+            } else {
+                // 7-column format: [3]=soc_code [4]=soc_name
+                $soc_code = $row[3];
+                $soc_name = $row[4] ?? '';
+            }
+
+            // Build SOC name map
+            if (!isset($out['soc'][$soc_code]) && $soc_name !== '') {
+                $out['soc'][$soc_code] = $soc_name;
+            }
+
+            // Build SOC → HLGT (avoid duplicates)
+            if (!isset($out['soc_hlgt'][$soc_code])) {
+                $out['soc_hlgt'][$soc_code] = [];
+            }
+            if (!in_array($hlgt_code, $out['soc_hlgt'][$soc_code])) {
+                $out['soc_hlgt'][$soc_code][] = $hlgt_code;
+            }
+
+            // Build HLGT → HLT
+            if (!isset($out['hlgt_hlt'][$hlgt_code])) {
+                $out['hlgt_hlt'][$hlgt_code] = [];
+            }
+            if (!in_array($hlt_code, $out['hlgt_hlt'][$hlgt_code])) {
+                $out['hlgt_hlt'][$hlgt_code][] = $hlt_code;
+            }
+
+            // Build HLT → PT
+            if (!isset($out['hlt_pt'][$hlt_code])) {
+                $out['hlt_pt'][$hlt_code] = [];
+            }
+            if (!in_array($pt_code, $out['hlt_pt'][$hlt_code])) {
+                $out['hlt_pt'][$hlt_code][] = $pt_code;
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -601,37 +707,64 @@ class MeddraHierarchyProviderModule extends AbstractExternalModule implements \O
     private function buildCacheFromAsc($folder)
     {
         $cache = [
-            'soc'      => [],   // soc_code  => soc_name
-            'hlgt'     => [],   // hlgt_code => hlgt_name
-            'hlt'      => [],   // hlt_code  => hlt_name
-            'pt'       => [],   // pt_code   => pt_name
-            'llt'      => [],   // llt_code  => llt_name  (current terms only)
-            'soc_hlgt' => [],   // soc_code  => [hlgt_code, ...]
-            'hlgt_hlt' => [],   // hlgt_code => [hlt_code, ...]
-            'hlt_pt'   => [],   // hlt_code  => [pt_code, ...]
-            'pt_llt'   => [],   // pt_code   => [llt_code, ...]
+            'soc'      => [],
+            'hlgt'     => [],
+            'hlt'      => [],
+            'pt'       => [],
+            'llt'      => [],
+            'soc_hlgt' => [],
+            'hlgt_hlt' => [],
+            'hlt_pt'   => [],
+            'pt_llt'   => [],
         ];
 
-        // ── SOC ──────────────────────────────────────────────────────────────
-        // Columns: [0] soc_code  [1] soc_name  [2] soc_abbrev  [3+] ...
+        // ── mdhier.asc (combined hierarchy — preferred when present) ──────────
+        // Real MedDRA distributions include mdhier.asc which contains the full
+        // PT→HLT→HLGT→SOC chain in a single file. When it exists we use it to
+        // build the hierarchy maps AND fill in SOC names.
+        // Separate mapping files (soc_hlgt.asc, hlgt_hlt.asc, hlt_pt.asc) are
+        // still preferred when they exist; mdhier.asc is used as a fallback.
+        $mdhier = $this->parseMdhier($folder);
+        if (!empty($mdhier['soc'])) {
+            // Fill SOC names from mdhier if soc.asc is absent
+            foreach ($mdhier['soc'] as $k => $v) {
+                if (!isset($cache['soc'][$k])) $cache['soc'][$k] = $v;
+            }
+        }
+
+        // ── SOC (soc.asc overrides mdhier names if present) ──────────────────
         foreach ($this->parseAsc($folder . '/soc.asc') as $row) {
             if (count($row) >= 2) $cache['soc'][$row[0]] = $row[1];
         }
 
         // ── HLGT ─────────────────────────────────────────────────────────────
-        // Columns: [0] hlgt_code  [1] hlgt_name  [2+] ...
         foreach ($this->parseAsc($folder . '/hlgt.asc') as $row) {
             if (count($row) >= 2) $cache['hlgt'][$row[0]] = $row[1];
         }
+        // If no hlgt.asc, synthesise entries using the code as the label so
+        // searching by code still works.
+        if (empty($cache['hlgt']) && !empty($mdhier['soc_hlgt'])) {
+            foreach ($mdhier['soc_hlgt'] as $soc_code => $hlgt_codes) {
+                foreach ($hlgt_codes as $code) {
+                    if (!isset($cache['hlgt'][$code])) $cache['hlgt'][$code] = 'HLGT-' . $code;
+                }
+            }
+        }
 
         // ── HLT ──────────────────────────────────────────────────────────────
-        // Columns: [0] hlt_code  [1] hlt_name  [2+] ...
         foreach ($this->parseAsc($folder . '/hlt.asc') as $row) {
             if (count($row) >= 2) $cache['hlt'][$row[0]] = $row[1];
         }
+        if (empty($cache['hlt']) && !empty($mdhier['hlgt_hlt'])) {
+            foreach ($mdhier['hlgt_hlt'] as $hlgt_code => $hlt_codes) {
+                foreach ($hlt_codes as $code) {
+                    if (!isset($cache['hlt'][$code])) $cache['hlt'][$code] = 'HLT-' . $code;
+                }
+            }
+        }
 
         // ── PT ───────────────────────────────────────────────────────────────
-        // Columns: [0] pt_code  [1] pt_name  [2] null  [3] pt_soc_code  [4+] ...
+        // Columns: [0] pt_code  [1] pt_name  [2] null  [3] pt_soc_code
         $pt_file = $folder . '/pt.asc';
         if (file_exists($pt_file)) {
             foreach ($this->parseAsc($pt_file) as $row) {
@@ -640,18 +773,9 @@ class MeddraHierarchyProviderModule extends AbstractExternalModule implements \O
         }
 
         // ── LLT ──────────────────────────────────────────────────────────────
-        // Columns: [0] llt_code  [1] llt_name  [2] pt_code
-        //          [3] whoart  [4] harts  [5] costart  [6] icd9  [7] icd9cm
-        //          [8] llt_currency  (Y = current/active, N = non-current/retired)
-        //
-        // IMPORTANT: We only include current LLTs (currency = 'Y').
-        // Non-current LLTs are retired synonyms that should not appear in
-        // new data collection. If currency is absent (malformed row), include
-        // the term to be safe.
-        //
-        // BUG NOTE: The currency field is at index [8], NOT [3].
-        // Index [3] is llt_whoart_code and is always empty — using it would
-        // cause '' === '' to be true and include ALL LLTs (including retired).
+        // [0] llt_code  [1] llt_name  [2] pt_code  [8] llt_currency (Y/N)
+        // For sample/pipe-delimited files the currency field may be absent —
+        // we include all rows when the row has fewer than 9 columns.
         $llt_file = $folder . '/llt.asc';
         if (file_exists($llt_file)) {
             foreach ($this->parseAsc($llt_file) as $row) {
@@ -659,43 +783,48 @@ class MeddraHierarchyProviderModule extends AbstractExternalModule implements \O
                     $currency = trim($row[8]);
                     if ($currency === 'Y' || $currency === '') {
                         $cache['llt'][$row[0]] = $row[1];
-                        // Build the reverse PT → [LLT, ...] mapping
-                        if (!empty($row[2])) {
-                            $cache['pt_llt'][$row[2]][] = $row[0];
-                        }
+                        if (!empty($row[2])) $cache['pt_llt'][$row[2]][] = $row[0];
                     }
+                } elseif (count($row) >= 3) {
+                    // Sample files: llt_code|llt_name|pt_code (no currency)
+                    $cache['llt'][$row[0]] = $row[1];
+                    $cache['pt_llt'][$row[2]][] = $row[0];
                 } elseif (count($row) >= 2) {
-                    // Fallback for malformed rows — include without currency filter
                     $cache['llt'][$row[0]] = $row[1];
                 }
             }
         }
 
-        // ── SOC → HLGT mapping ───────────────────────────────────────────────
-        // Columns: [0] soc_code  [1] hlgt_code
+        // ── Hierarchy maps: prefer explicit files, fall back to mdhier ────────
+
+        // SOC → HLGT
+        $has_soc_hlgt = false;
         foreach ($this->parseAsc($folder . '/soc_hlgt.asc') as $row) {
-            if (count($row) >= 2) {
-                $cache['soc_hlgt'][$row[0]][] = $row[1];
-            }
+            if (count($row) >= 2) { $cache['soc_hlgt'][$row[0]][] = $row[1]; $has_soc_hlgt = true; }
+        }
+        if (!$has_soc_hlgt && !empty($mdhier['soc_hlgt'])) {
+            $cache['soc_hlgt'] = $mdhier['soc_hlgt'];
         }
 
-        // ── HLGT → HLT mapping ───────────────────────────────────────────────
-        // Columns: [0] hlgt_code  [1] hlt_code
+        // HLGT → HLT
+        $has_hlgt_hlt = false;
         foreach ($this->parseAsc($folder . '/hlgt_hlt.asc') as $row) {
-            if (count($row) >= 2) {
-                $cache['hlgt_hlt'][$row[0]][] = $row[1];
-            }
+            if (count($row) >= 2) { $cache['hlgt_hlt'][$row[0]][] = $row[1]; $has_hlgt_hlt = true; }
+        }
+        if (!$has_hlgt_hlt && !empty($mdhier['hlgt_hlt'])) {
+            $cache['hlgt_hlt'] = $mdhier['hlgt_hlt'];
         }
 
-        // ── HLT → PT mapping ─────────────────────────────────────────────────
-        // Columns: [0] hlt_code  [1] pt_code
+        // HLT → PT
+        $has_hlt_pt = false;
         $hlt_pt_file = $folder . '/hlt_pt.asc';
         if (file_exists($hlt_pt_file)) {
             foreach ($this->parseAsc($hlt_pt_file) as $row) {
-                if (count($row) >= 2) {
-                    $cache['hlt_pt'][$row[0]][] = $row[1];
-                }
+                if (count($row) >= 2) { $cache['hlt_pt'][$row[0]][] = $row[1]; $has_hlt_pt = true; }
             }
+        }
+        if (!$has_hlt_pt && !empty($mdhier['hlt_pt'])) {
+            $cache['hlt_pt'] = $mdhier['hlt_pt'];
         }
 
         return $cache;
